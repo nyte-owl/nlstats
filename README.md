@@ -5,7 +5,7 @@ channel.
 
 ## webapp
 This folder contains the code for the web application.  It uses the
-(Python Dash)[https://dash.plotly.com/introduction] framework.
+[Python Dash](https://dash.plotly.com/introduction) framework.
 
 ## etl
 This folder contains the code for the ETL pipeline application.  It connects to YouTube
