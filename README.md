@@ -1,5 +1,5 @@
 # NL Stats
-This project is a web application and ETL pipeline for the NL Stats website.  The
+This project is a web application and ETL pipeline for the [NL Stats website](https://nlstats.com).  The
 website collects, aggregates and displays various stats for NorthernLion's YouTube
 channel.
 
