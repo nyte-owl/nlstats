@@ -1,0 +1,9 @@
+# Python artifacts
+venv/
+**/__pycache__/
+
+# Testing/Prototyping Files
+*.env
+*.csv
+*.ipynb
+*.parquet
