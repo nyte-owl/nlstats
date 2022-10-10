@@ -17,7 +17,7 @@ all_games = df_videos.groupby("Game")["Title"].count().sort_values(ascending=Fal
 most_uploaded = df_videos["Game"].value_counts().index.tolist()[:4]
 
 df_views_over_time = (
-    df_videos.set_index("Publish Date").resample("W").sum()[["Views"]].reset_index()
+    df_videos.set_index("Publish Date")[["Views"]].resample("W").sum().reset_index()
 )
 
 
@@ -101,21 +101,21 @@ df_most_published_games = obtain_ranked_df(
 df_most_viewed_videos = obtain_ranked_df(
     df=df_videos,
     rank_by_col="Views",
-    columns_shown=["Title", "Publish Date", "Views"],
+    columns_shown=["id", "Title", "Publish Date", "Views"],
     str_conv_col="Views",
 )
 
 df_longest_videos = obtain_ranked_df(
     df=df_videos,
     rank_by_col="Duration (Seconds)",
-    columns_shown=["Title", "Publish Date", "Views", "Duration"],
+    columns_shown=["id", "Title", "Publish Date", "Views", "Duration"],
     str_conv_col="Views",
 )
 
 df_video_highest_like_rate = obtain_ranked_df(
     df=df_videos,
     rank_by_col="Likes per 1000 Views",
-    columns_shown=["Title", "Publish Date", "Likes per 1000 Views", "Views"],
+    columns_shown=["id", "Title", "Publish Date", "Likes per 1000 Views", "Views"],
 )
 
 df_game_highest_like_rate = obtain_ranked_df(

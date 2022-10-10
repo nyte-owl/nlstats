@@ -5,7 +5,7 @@ import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 import pandas as pd
 
-from .. import data
+from .. import data, util
 from log import get_logger
 
 logger = get_logger(__name__)
@@ -18,27 +18,8 @@ class LeaderboardTab(str, Enum):
     length = "Length"
 
 
-def create_dmc_table(df: pd.DataFrame):
-    table_header = [
-        html.Thead(html.Tr([html.Th(col_name) for col_name in df.columns.tolist()]))
-    ]
-
-    rows = [
-        html.Tr([html.Td(str(row[col])) for col in df.columns.tolist()])
-        for _, row in df.iterrows()
-    ]
-
-    table_body = [html.Tbody(rows)]
-
-    return dmc.Table(
-        table_header + table_body,
-        highlightOnHover=True,
-        striped=True,
-    )
-
-
 def make_single_leaderboard(dataframe: pd.DataFrame):
-    dmc_table = create_dmc_table(dataframe)
+    dmc_table = util.create_dmc_table(dataframe)
     return html.Div(children=[dmc_table])
 
 

@@ -1,15 +1,14 @@
 import random
 from datetime import date, timedelta
 
-from dash import dcc, html, callback, Input, Output, ctx, no_update
 import dash_bootstrap_components as dbc
-from dash_iconify import DashIconify
 import dash_mantine_components as dmc
 import pandas as pd
 import plotly.express as px
+from dash import Input, Output, callback, ctx, dcc, html, no_update
+from dash_iconify import DashIconify
 
-from .. import data
-
+from .. import data, util
 import config
 
 
@@ -22,13 +21,14 @@ def create_card(title: str, body, centered: bool = True, icon: str | None = None
     return dmc.Alert(title=title, children=body, icon=icon)
 
 
-def create_graph_card(title: str, figure):
+def create_graph_card(title: str, figure, extra_content=[]):
     card_content = (
         dmc.Stack(
             [
                 dmc.Text(title, color="blue", weight="bold", size="sm"),
                 dmc.LoadingOverlay(children=[dcc.Graph(figure=figure)]),
-            ],
+            ]
+            + extra_content,
             spacing="xs",
             align="stretch",
         ),
@@ -78,6 +78,32 @@ def get_content(date_picked: date):
         (data.df_videos["Publish Date"].dt.month == date_picked.month)
         & (data.df_videos["Publish Date"].dt.year == date_picked.year)
     ]
+
+    by_game_accordion = []
+    for game, game_df in df.groupby("Game"):
+        accordion = dmc.AccordionItem(
+            label=game,
+            children=[
+                util.create_dmc_table(
+                    game_df[
+                        ["id", "Title", "Publish Date", "Views", "Likes", "Comments"]
+                    ]
+                )
+            ],
+        )
+        by_game_accordion.append(accordion)
+
+    post_history = dmc.Accordion(
+        icon=[
+            DashIconify(
+                icon="tabler:arrow-big-down-line",
+                color=dmc.theme.DEFAULT_COLORS["blue"][6],
+            )
+        ],
+        children=by_game_accordion,
+        multiple=True,
+        iconPosition="right",
+    )
 
     most_viewed_video = df.sort_values(by="Views", ascending=False).iloc[0]
     most_liked_video = df.sort_values(by="Likes per 1000 Views", ascending=False).iloc[
@@ -214,7 +240,9 @@ def get_content(date_picked: date):
     )
 
     content_grid_builder.add_col(
-        create_graph_card(title="Post History", figure=bar_post_history),
+        create_graph_card(
+            title="Post History", figure=bar_post_history, extra_content=[post_history]
+        ),
         width=12,
     )
 
@@ -227,6 +255,34 @@ min_date = date.fromisoformat(config.settings.start_date)
 if min_date.day == 1:
     min_date = min_date + timedelta(days=1)
 
+
+month_nav = dmc.Group(
+    [
+        d_previous_month := dmc.Button(
+            children="",
+            leftIcon=[DashIconify(icon="akar-icons:arrow-left-thick")],
+            id="prev-month-btn",
+        ),
+        d_date_picker := dmc.DatePicker(
+            value=date.today(),
+            inputFormat="MMMM YYYY",
+            initialLevel="month",
+            style={"text-align": "center"},
+            allowLevelChange=False,
+            shadow="md",
+            maxDate=date.today(),
+            minDate=min_date,
+            icon=[DashIconify(icon="clarity:date-line")],
+        ),
+        d_next_month := dmc.Button(
+            children="",
+            rightIcon=[DashIconify(icon="akar-icons:arrow-right-thick")],
+            id="next-month-btn",
+        ),
+    ],
+    position="center",
+)
+
 layout = html.Div(
     children=[
         dbc.Row(
@@ -235,34 +291,7 @@ layout = html.Div(
         ),
         dmc.Container(
             dmc.Paper(
-                dmc.Group(
-                    [
-                        d_previous_month := dmc.Button(
-                            children="",
-                            leftIcon=[DashIconify(icon="akar-icons:arrow-left-thick")],
-                            id="prev-month-btn",
-                        ),
-                        d_date_picker := dmc.DatePicker(
-                            value=date.today(),
-                            inputFormat="MMMM YYYY",
-                            initialLevel="month",
-                            style={"text-align": "center"},
-                            allowLevelChange=False,
-                            shadow="md",
-                            maxDate=date.today(),
-                            minDate=min_date,
-                            icon=[DashIconify(icon="clarity:date-line")],
-                        ),
-                        d_next_month := dmc.Button(
-                            children="",
-                            rightIcon=[
-                                DashIconify(icon="akar-icons:arrow-right-thick")
-                            ],
-                            id="next-month-btn",
-                        ),
-                    ],
-                    position="center",
-                ),
+                children=month_nav,
                 p="sm",
                 radius="md",
             ),
