@@ -1,5 +1,6 @@
 import pytz
 from dash import Dash, Input, Output, callback, dcc, html, State
+from flask import request, redirect
 import dash_mantine_components as dmc
 
 from data import crud
@@ -19,6 +20,15 @@ app = Dash(
 app.config.suppress_callback_exceptions = True
 
 server = app.server
+
+
+@server.before_request
+def before_request():
+    if not request.is_secure:
+        url = request.url.replace("http://", "https://", 1)
+        code = 301
+        return redirect(url, code=code)
+
 
 tab_style = {
     "backgroundColor": colors["background"],
