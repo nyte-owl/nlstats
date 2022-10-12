@@ -156,7 +156,47 @@ def get_content(date_picked: date):
         plot_bgcolor="rgba(0,0,0,0)",
     )
 
+    def top_video_layout(video: pd.Series, key_column: str):
+        image = dmc.Image(
+            src=f"https://i.ytimg.com/vi/{video['id']}/mqdefault.jpg",
+            width=320,
+        )
+        return dmc.Container(
+            [
+                image,
+                html.H4(video["Title"]),
+                html.P(f"{video[key_column]} {key_column}"),
+            ],
+            px=0,
+        )
+
     content_grid_builder = GridBuilder()
+    content_grid_builder.add_col(
+        create_card(
+            title="Most Viewed Video",
+            body=top_video_layout(most_viewed_video, "Views"),
+            centered=False,
+            icon="akar-icons:eye",
+        )
+    )
+    content_grid_builder.add_col(
+        create_card(
+            title="Most Liked Video",
+            body=top_video_layout(most_liked_video, "Likes per 1000 Views"),
+            centered=False,
+            icon="fa:thumbs-o-up",
+        )
+    )
+
+    content_grid_builder.add_col(
+        create_card(
+            title="Most Discussed Video",
+            body=top_video_layout(most_discussed_video, "Comments per 1000 Views"),
+            centered=False,
+            icon="bx:comment-detail",
+        )
+    )
+
     stat_column = GridBuilder()
     stat_column.add_col(
         create_stat_card(
@@ -191,56 +231,6 @@ def get_content(date_picked: date):
             figure=pie_game_count,
         ),
         width=8,
-    )
-
-    content_grid_builder.add_col(
-        create_card(
-            title="Most Viewed Video",
-            body=dmc.Container(
-                [
-                    html.H4(most_viewed_video["Title"]),
-                    html.P(f"{most_viewed_video['Views']} Views"),
-                ],
-                px=0,
-            ),
-            centered=False,
-            icon="akar-icons:eye",
-        )
-    )
-    content_grid_builder.add_col(
-        create_card(
-            title="Most Liked Video",
-            body=dmc.Container(
-                [
-                    html.H4(most_liked_video["Title"]),
-                    html.P(
-                        f"{most_liked_video['Likes per 1000 Views']} "
-                        "Likes per 1000 Views"
-                    ),
-                ],
-                px=0,
-            ),
-            centered=False,
-            icon="fa:thumbs-o-up",
-        )
-    )
-
-    content_grid_builder.add_col(
-        create_card(
-            title="Most Discussed Video",
-            body=dmc.Container(
-                [
-                    html.H4(most_discussed_video["Title"]),
-                    html.P(
-                        f"{most_discussed_video['Comments per 1000 Views']} "
-                        "Comments per 1000 Views"
-                    ),
-                ],
-                px=0,
-            ),
-            centered=False,
-            icon="bx:comment-detail",
-        )
     )
 
     content_grid_builder.add_col(
