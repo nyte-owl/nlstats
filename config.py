@@ -15,6 +15,9 @@ class GeneralSettings(BaseSettings):
 
     start_date: str = "2019-06-01"
 
+    heroku_app_name: str = "nlstats"
+    heroku_oauth_token: str
+
     class Config:
         env_file = ".env"
 
