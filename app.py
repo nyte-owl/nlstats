@@ -153,8 +153,8 @@ app_content = html.Div(
         navbar,
         div_page_content := dmc.Container(
             style={"margin-top": "90px"},
-            px="xl",
-            size="lg",
+            px="xs",
+            size="xl",
         ),
         html.Div(
             footer,
