@@ -2,6 +2,7 @@ import pytz
 from dash import Dash, Input, Output, callback, dcc, html, State
 from flask import request, redirect
 import dash_mantine_components as dmc
+from dash_iconify import DashIconify
 
 from data import crud
 from webapp.dashboard import pages
@@ -49,26 +50,38 @@ tab_selected_style.update(
 
 logo_size_pixels = 40
 
+
+def make_header_link(text: str, href: str, icon: str) -> dcc.Link:
+    text_portion = dmc.Text(text, color="gray")
+    icon_portion = dmc.ThemeIcon(
+        DashIconify(
+            icon=icon,
+            width=22,
+        ),
+        radius=30,
+        size=36,
+        variant="outline",
+        color="blue",
+    )
+    return dcc.Link(
+        dmc.Group([icon_portion, text_portion], spacing="xs"),
+        href=href,
+        style={"textDecoration": "none"},
+    )
+
+
 nav_buttons = dmc.Center(
     dmc.Group(
         position="right",
         align="center",
         spacing="xl",
         children=[
-            dcc.Link(
-                dmc.Text("Home", color="gray"),
-                href="/",
-                style={"textDecoration": "none"},
+            make_header_link("Home", "/", "bi:house-door"),
+            make_header_link(
+                "Leaderboards", "/leaderboards", "ant-design:ordered-list-outlined"
             ),
-            dcc.Link(
-                dmc.Text("Leaderboards", color="gray"),
-                href="/leaderboards",
-                style={"textDecoration": "none"},
-            ),
-            dcc.Link(
-                dmc.Text("Monthly Reports", color="gray"),
-                href="/monthly",
-                style={"textDecoration": "none"},
+            make_header_link(
+                "Monthly Reports", "/monthly", "ant-design:calendar-outlined"
             ),
         ],
     ),

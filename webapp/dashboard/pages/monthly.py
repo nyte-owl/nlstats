@@ -22,14 +22,14 @@ def create_card(title: str, body, centered: bool = True, icon: str | None = None
     if icon:
         icon = [DashIconify(icon=icon)]
 
-    return dmc.Alert(title=title, children=body, icon=icon)
+    return dmc.Alert(title=title, children=body, icon=icon, color="green")
 
 
 def create_graph_card(title: str, figure, extra_content=[]):
     card_content = (
         dmc.Stack(
             [
-                dmc.Text(title, color="blue", weight="bold", size="sm"),
+                dmc.Text(title, color="green", weight="bold", size="sm"),
                 dmc.LoadingOverlay(children=[dcc.Graph(figure=figure)]),
             ]
             + extra_content,
@@ -58,7 +58,7 @@ def create_stat_card(
         body=dmc.Text(
             stat_num,
             variant="gradient",
-            gradient={"from": "red", "to": "yellow", "deg": gradient},
+            gradient={"from": "blue", "to": "grape", "deg": gradient},
             style={"fontSize": 50},
         ),
         centered=centered,
@@ -101,7 +101,7 @@ def get_content(date_picked: date):
         icon=[
             DashIconify(
                 icon="tabler:arrow-big-down-line",
-                color=dmc.theme.DEFAULT_COLORS["blue"][6],
+                color=dmc.theme.DEFAULT_COLORS["green"][6],
             )
         ],
         children=by_game_accordion,
