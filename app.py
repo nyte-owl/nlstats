@@ -24,6 +24,9 @@ server = app.server
 
 @server.before_request
 def before_request():
+    if config.settings.local_development:
+        return
+
     if not request.is_secure:
         url = request.url.replace("http://", "https://", 1)
         code = 301

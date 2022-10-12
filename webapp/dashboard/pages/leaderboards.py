@@ -78,6 +78,8 @@ tab_definitions = {
     LeaderboardTab.length: "bxs:time-five",
 }
 
+tabs = list(tab_definitions.keys())
+
 tab_selections = [
     [
         {"value": key, "label": info["label"]}
@@ -125,10 +127,11 @@ layout = html.Div(
 
 @callback(Output(d_select, "data"), Output(d_select, "value"), Input(d_tabs, "active"))
 def switch_tab(active_tab: int):
-    logger.debug(f"enter: {active_tab}")
+    logger.info(f"[leaderboards] Go to tab: {tabs[active_tab].value}")
     return tab_selections[active_tab], tab_selections[active_tab][0]["value"]
 
 
 @callback(Output(d_content, "children"), Input(d_select, "value"))
 def switch_views_board(selected_board):
+    logger.info(f"[leaderboards] Go to board: {selected_board}")
     return make_single_leaderboard(all_boards[selected_board]["df"])

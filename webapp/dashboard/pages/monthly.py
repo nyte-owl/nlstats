@@ -10,6 +10,10 @@ from dash_iconify import DashIconify
 
 from .. import data, util
 import config
+import log
+
+
+logger = log.get_logger(__name__)
 
 
 def create_card(title: str, body, centered: bool = True, icon: str | None = None):
@@ -318,6 +322,7 @@ layout = html.Div(
     Input(d_date_picker, "value"),
 )
 def update_content(date_value):
+    logger.info(f"[monthly] Update monthly page with date {date_value}")
     if date_value is not None:
         date_object = date.fromisoformat(date_value)
         next_month: date = (date_object + pd.DateOffset(months=1)).date()
@@ -357,8 +362,10 @@ def update_calendar_from_button(n_clicks_next, n_clicks_prev, date_value):
         date_object = date.fromisoformat(date_value)
         if ctx.triggered_id == "next-month-btn":
             new_date: date = (date_object + pd.DateOffset(months=1)).date()
+            logger.info(f"[monthly] Next month button - {new_date}")
         elif ctx.triggered_id == "prev-month-btn":
             new_date: date = (date_object - pd.DateOffset(months=1)).date()
+            logger.info(f"[monthly] Previous month button - {new_date}")
         else:
             new_date = date_value
 

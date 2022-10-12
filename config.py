@@ -18,6 +18,8 @@ class GeneralSettings(BaseSettings):
     heroku_app_name: str = "nlstats"
     heroku_oauth_token: str
 
+    local_development: bool = False
+
     class Config:
         env_file = ".env"
 
