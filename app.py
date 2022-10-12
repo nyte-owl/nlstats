@@ -151,10 +151,10 @@ app_content = html.Div(
     [
         d_url := dcc.Location(id="url"),
         navbar,
-        dmc.Grid(
-            div_page_content := dmc.Col(offset=1, span=8),
-            columns=10,
-            style={"padding-top": "90px"},
+        div_page_content := dmc.Container(
+            style={"margin-top": "90px"},
+            px="xl",
+            size="lg",
         ),
         html.Div(
             footer,
