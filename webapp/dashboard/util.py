@@ -20,7 +20,7 @@ def link_from_id(link_text: str, yt_id: str) -> str:
     )
 
 
-def create_dmc_table(df: pd.DataFrame):
+def create_dmc_table(df: pd.DataFrame, spacing: str = "xs"):
     do_yt_links = "id" in df.columns and "Title" in df.columns
 
     def convert_row(row):
@@ -55,4 +55,5 @@ def create_dmc_table(df: pd.DataFrame):
         table_header + table_body,
         highlightOnHover=True,
         striped=True,
+        verticalSpacing=spacing,
     )

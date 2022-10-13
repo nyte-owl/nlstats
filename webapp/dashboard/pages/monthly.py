@@ -74,7 +74,8 @@ def get_content(date_picked: date):
                 util.create_dmc_table(
                     game_df[
                         ["id", "Title", "Publish Date", "Views", "Likes", "Comments"]
-                    ]
+                    ],
+                    spacing="md",
                 )
             ],
         )
