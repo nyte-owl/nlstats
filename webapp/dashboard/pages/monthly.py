@@ -1,4 +1,3 @@
-import random
 from datetime import date, timedelta
 
 import dash_bootstrap_components as dbc
@@ -52,13 +51,10 @@ def create_graph_card(title: str, figure, extra_content=[]):
 def create_stat_card(
     title: str, stat_num: str, centered: bool = True, icon: str | None = None
 ):
-    gradient = random.randint(0, 360)
     return create_card(
         title=title,
         body=dmc.Text(
             stat_num,
-            variant="gradient",
-            gradient={"from": "blue", "to": "grape", "deg": gradient},
             style={"fontSize": 50},
         ),
         centered=centered,
@@ -156,16 +152,27 @@ def get_content(date_picked: date):
         plot_bgcolor="rgba(0,0,0,0)",
     )
 
-    def top_video_layout(video: pd.Series, key_column: str):
+    def top_video_layout(video: pd.Series, key_column: str, use_commas: bool = False):
         image = dmc.Image(
             src=f"https://i.ytimg.com/vi/{video['id']}/mqdefault.jpg",
             width=320,
         )
+        if use_commas:
+            stat_text = f"{video[key_column]:,} {key_column}"
+        else:
+            stat_text = f"{video[key_column]} {key_column}"
+
         return dmc.Container(
             [
-                image,
-                html.H4(video["Title"]),
-                html.P(f"{video[key_column]} {key_column}"),
+                dmc.Anchor(
+                    [
+                        image,
+                        dmc.Title(video["Title"], order=5),
+                    ],
+                    href=util.href_from_id(video["id"]),
+                    target="_blank",
+                ),
+                dmc.Text(stat_text, weight=500),
             ],
             px=0,
         )
@@ -174,7 +181,7 @@ def get_content(date_picked: date):
     content_grid_builder.add_col(
         create_card(
             title="Most Viewed Video",
-            body=top_video_layout(most_viewed_video, "Views"),
+            body=top_video_layout(most_viewed_video, "Views", use_commas=True),
             centered=False,
             icon="akar-icons:eye",
         )

@@ -19,6 +19,25 @@ app = Dash(
     external_stylesheets=[google_fonts_stylesheet],
 )
 app.config.suppress_callback_exceptions = True
+app.index_string = f"""
+<!DOCTYPE html>
+<html>
+    <head>
+        {{%metas%}}
+        <title>{{%title%}}</title>
+        {{%favicon%}}
+        {{%css%}}
+    </head>
+    <body style="background-color:{dmc.theme.DEFAULT_COLORS["dark"][7]}">
+        {{%app_entry%}}
+        <footer>
+            {{%config%}}
+            {{%scripts%}}
+            {{%renderer%}}
+        </footer>
+    </body>
+</html>
+"""
 
 server = app.server
 

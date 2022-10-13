@@ -7,10 +7,14 @@ from log import get_logger
 logger = get_logger(__name__)
 
 
+def href_from_id(yt_id: str) -> str:
+    return f"https://www.youtube.com/watch?v={yt_id}"
+
+
 def link_from_id(link_text: str, yt_id: str) -> str:
     return dmc.Anchor(
         link_text,
-        href=f"https://www.youtube.com/watch?v={yt_id}",
+        href=href_from_id(yt_id),
         target="_blank",
         weight="bold",
     )
