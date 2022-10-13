@@ -40,6 +40,9 @@ def clean_video_data(df_videos: pd.DataFrame):
 
     def parse_title(title: str):
         matches = re.findall(r"[^|]+ \|([^#(]+)", title)
+        if "Northernlion Live Super Show" in title:
+            return None
+
         if matches:
             return matches[-1].strip()
         else:
