@@ -21,25 +21,23 @@ def create_card(title: str, body, centered: bool = True, icon: str | None = None
     if icon:
         icon = [DashIconify(icon=icon)]
 
-    return dmc.Alert(title=title, children=body, icon=icon, color="green")
+    return dmc.Alert(title=title, children=body, icon=icon, color="red")
 
 
 def create_graph_card(title: str, figure, extra_content=[]):
-    card_content = (
-        dmc.Stack(
-            [
-                dmc.Text(title, color="green", weight="bold", size="sm"),
-                dmc.LoadingOverlay(children=[dcc.Graph(figure=figure)]),
-            ]
-            + extra_content,
-            spacing="xs",
-            align="stretch",
-        ),
+    card_content = dmc.Stack(
+        [
+            dmc.Text(title, color="red", weight="bold", size="sm"),
+            dmc.LoadingOverlay(children=[dcc.Graph(figure=figure)]),
+        ]
+        + extra_content,
+        spacing="xs",
+        align="stretch",
     )
 
     content = dmc.Paper(
         card_content,
-        withBorder=True,
+        withBorder=False,
         px="md",
         py="xs",
         style={"backgroundColor": dmc.theme.DEFAULT_COLORS["dark"][5]},
@@ -60,17 +58,6 @@ def create_stat_card(
         centered=centered,
         icon=icon,
     )
-
-
-class GridBuilder:
-    def __init__(self):
-        self.children = []
-
-    def add_col(self, body, width: int = 4):
-        self.children.append(dmc.Col(children=body, span=width))
-
-    def get_grid(self) -> dmc.Grid:
-        return dmc.Grid(children=self.children, gutter="xl", grow=True)
 
 
 def get_content(date_picked: date):
@@ -97,7 +84,7 @@ def get_content(date_picked: date):
         icon=[
             DashIconify(
                 icon="tabler:arrow-big-down-line",
-                color=dmc.theme.DEFAULT_COLORS["green"][6],
+                color=dmc.theme.DEFAULT_COLORS["red"][6],
             )
         ],
         children=by_game_accordion,
@@ -128,9 +115,10 @@ def get_content(date_picked: date):
 
     pie_game_count = px.pie(df_game_count, values="Count", names="Game")
     pie_game_count.update_layout(
-        legend_borderwidth=3,
+        legend_borderwidth=2,
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
     )
 
     # Posts
@@ -148,8 +136,10 @@ def get_content(date_picked: date):
 
     bar_post_history = px.bar(df_post_history, x="Date", y="Count", color="Game")
     bar_post_history.update_layout(
+        legend_borderwidth=2,
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
     )
 
     def top_video_layout(video: pd.Series, key_column: str, use_commas: bool = False):
@@ -177,79 +167,79 @@ def get_content(date_picked: date):
             px=0,
         )
 
-    content_grid_builder = GridBuilder()
-    content_grid_builder.add_col(
-        create_card(
-            title="Most Viewed Video",
-            body=top_video_layout(most_viewed_video, "Views", use_commas=True),
-            centered=False,
-            icon="akar-icons:eye",
-        )
+    most_viewed_card = create_card(
+        title="Most Viewed Video",
+        body=top_video_layout(most_viewed_video, "Views", use_commas=True),
+        centered=False,
+        icon="akar-icons:eye",
     )
-    content_grid_builder.add_col(
-        create_card(
-            title="Most Liked Video",
-            body=top_video_layout(most_liked_video, "Likes per 1000 Views"),
-            centered=False,
-            icon="fa:thumbs-o-up",
-        )
+    most_liked_card = create_card(
+        title="Most Liked Video",
+        body=top_video_layout(most_liked_video, "Likes per 1000 Views"),
+        centered=False,
+        icon="fa:thumbs-o-up",
     )
 
-    content_grid_builder.add_col(
-        create_card(
-            title="Most Discussed Video",
-            body=top_video_layout(most_discussed_video, "Comments per 1000 Views"),
-            centered=False,
-            icon="bx:comment-detail",
-        )
+    most_discussed_card = create_card(
+        title="Most Discussed Video",
+        body=top_video_layout(most_discussed_video, "Comments per 1000 Views"),
+        centered=False,
+        icon="bx:comment-detail",
+    )
+    top_videos_grid = dmc.SimpleGrid(
+        cols=3,
+        spacing="xl",
+        breakpoints=[{"maxWidth": "lg", "cols": 1}],
+        children=[most_viewed_card, most_liked_card, most_discussed_card],
     )
 
-    stat_column = GridBuilder()
-    stat_column.add_col(
-        create_stat_card(
-            title="Videos Published",
-            stat_num=str(len(df)),
-            icon="material-symbols:youtube-activity",
-        ),
-        width=12,
-    )
-    stat_column.add_col(
-        create_stat_card(
-            title="Total Views",
-            stat_num=f'{df["Views"].sum():,}',
-            icon="akar-icons:eye",
-        ),
-        width=12,
-    )
-    stat_column.add_col(
-        create_stat_card(
-            title="Comments per 1000 Views",
-            stat_num=f'{df["Comments per 1000 Views"].mean():.04}',
-            icon="bx:comment-detail",
-        ),
-        width=12,
+    stat_column = dmc.SimpleGrid(
+        [
+            create_stat_card(
+                title="Videos Published",
+                stat_num=str(len(df)),
+                icon="material-symbols:youtube-activity",
+            ),
+            create_stat_card(
+                title="Total Views",
+                stat_num=f'{df["Views"].sum():,}',
+                icon="akar-icons:eye",
+            ),
+            create_stat_card(
+                title="Comments per 1000 Views",
+                stat_num=f'{df["Comments per 1000 Views"].mean():.04}',
+                icon="bx:comment-detail",
+            ),
+        ],
+        spacing="xl",
+        cols=1,
     )
 
-    content_grid_builder.add_col(stat_column.get_grid())
-
-    content_grid_builder.add_col(
-        create_graph_card(
-            title="Featured Games",
-            figure=pie_game_count,
-        ),
-        width=8,
+    featured_game_card = create_graph_card(
+        title="Featured Games",
+        figure=pie_game_count,
     )
 
-    content_grid_builder.add_col(
-        create_graph_card(
-            title="Post History", figure=bar_post_history, extra_content=[post_history]
-        ),
-        width=12,
+    post_history_card = create_graph_card(
+        title="Post History", figure=bar_post_history, extra_content=[post_history]
     )
 
-    return [
-        content_grid_builder.get_grid(),
-    ]
+    return dmc.SimpleGrid(
+        [
+            top_videos_grid,
+            dmc.Grid(
+                [
+                    dmc.Col(stat_column, md=4, sm=12),
+                    dmc.Col(featured_game_card, md=8, sm=12),
+                ],
+                grow=True,
+                gutter="xl",
+            ),
+            post_history_card,
+        ],
+        cols=1,
+        spacing="xl",
+    )
 
 
 min_date = date.fromisoformat(config.settings.start_date)
