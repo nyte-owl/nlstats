@@ -96,12 +96,13 @@ tab_content = dmc.Container(
                 size="xl",
                 variant="default",
                 icon=[DashIconify(icon="line-md:menu-unfold-right")],
-                style={"width": "60%", "margin-bottom": "20px"},
+                style={"width": "80%", "margin-bottom": "20px"},
                 radius="md",
             ),
         ),
-        dmc.LoadingOverlay(children=[d_content := dmc.Container(children=[])]),
-    ]
+        dmc.LoadingOverlay(children=[d_content := dmc.Container(children=[], px=0)]),
+    ],
+    px="xs",
 )
 
 page_content = dmc.Paper(
@@ -117,7 +118,8 @@ page_content = dmc.Paper(
         tab_content,
     ],
     withBorder=True,
-    style={"padding": "25px"},
+    px="sm",
+    py="sm",
 )
 
 layout = html.Div(
