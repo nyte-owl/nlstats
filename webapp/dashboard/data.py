@@ -12,6 +12,14 @@ def convert_seconds(seconds):
 
 
 df_videos = crud.processed_stat.get_most_recent_processed_stat_dataframe()
+df_videos["Likes per 1000 Views"] = (
+    df_videos["Likes"] / (df_videos["Views"] / 1000)
+).round(3)
+df_videos["Comments per 1000 Views"] = (
+    df_videos["Comments"] / (df_videos["Views"] / 1000)
+).round(3)
+
+
 df_videos["Duration"] = df_videos["Duration (Seconds)"].apply(convert_seconds)
 all_games = df_videos.groupby("Game")["Title"].count().sort_values(ascending=False)
 most_uploaded = df_videos["Game"].value_counts().index.tolist()[:4]

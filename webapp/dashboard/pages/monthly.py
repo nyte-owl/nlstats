@@ -208,7 +208,7 @@ def get_content(date_picked: date):
             ),
             create_stat_card(
                 title="Comments per 1000 Views",
-                stat_num=f'{df["Comments per 1000 Views"].mean():.04}',
+                stat_num=f'{df["Comments"].sum() / (df["Views"].sum() / 1000):.04}',
                 icon="bx:comment-detail",
             ),
         ],
