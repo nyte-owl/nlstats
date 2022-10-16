@@ -44,11 +44,11 @@ app.index_string = f"""
         <!-- Google tag (gtag.js) -->
         <script async src="{gtag_js_url}"></script>
         <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){{dataLayer.push(arguments);}}
-        gtag('js', new Date());
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){{dataLayer.push(arguments);}}
+          gtag('js', new Date());
 
-        gtag('config', '{config.settings.gtag_analytics_code}');
+          gtag('config', '{config.settings.gtag_analytics_code}');
         </script>
 
         {{%metas%}}
