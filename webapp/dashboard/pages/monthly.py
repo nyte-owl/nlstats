@@ -1,10 +1,9 @@
 from datetime import date, timedelta
 
-import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 import pandas as pd
 import plotly.express as px
-from dash import Input, Output, callback, ctx, dcc, html, no_update
+from dash import Input, Output, callback, ctx, dcc, no_update
 from dash_iconify import DashIconify
 
 from .. import data, util
@@ -275,27 +274,19 @@ month_nav = dmc.Group(
     position="center",
 )
 
-layout = html.Div(
+layout = dmc.Stack(
     children=[
-        dbc.Row(
-            [html.H1("Monthly Report")],
-            style={"text-align": "center"},
-        ),
+        dmc.Center(dmc.Title("Monthly Report", order=1)),
         dmc.Container(
             dmc.Paper(
                 children=month_nav,
                 p="sm",
                 radius="md",
             ),
-            size="sm",
+            size="md",
         ),
-        dbc.Row(
-            [d_current_month := html.H2("")],
-            style={"text-align": "center", "margin-top": "20px"},
-        ),
-        dbc.Row(
-            dbc.Col(d_content := dmc.LoadingOverlay()),
-        ),
+        dmc.Center(d_current_month := dmc.Title("", order=2)),
+        d_content := dmc.LoadingOverlay(),
     ],
 )
 

@@ -36,30 +36,26 @@ gtag_js_url = (
 preview_image = config.settings.custom_url.rstrip("/") + app.get_asset_url(
     "preview_image.png"
 )
-logger.info(f"{preview_image=}")
-app.index_string = f"""
-<!DOCTYPE html>
+app.index_string = f"""<!DOCTYPE html>
 <html>
     <head>
         <!-- Google tag (gtag.js) -->
         <script async src="{gtag_js_url}"></script>
         <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){{dataLayer.push(arguments);}}
-          gtag('js', new Date());
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){{dataLayer.push(arguments);}}
+            gtag('js', new Date());
 
-          gtag('config', '{config.settings.gtag_analytics_code}');
+            gtag('config', '{config.settings.gtag_analytics_code}');
         </script>
 
         {{%metas%}}
-        <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{config.settings.custom_url}">
         <meta property="og:title" content="{title}">
         <meta property="og:description" content="{description}">
         <meta property="og:image" content="{preview_image}">
 
-        <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{config.settings.custom_url}">
         <meta property="twitter:title" content="{title}">
@@ -134,7 +130,10 @@ app_content = html.Div(
     ],
 )
 app.layout = dmc.MantineProvider(
-    theme={"colorScheme": "dark"},
+    theme={
+        "colorScheme": "dark",
+        "fontFamily": "'Inter', sans-serif",
+    },
     children=[app_content],
     withGlobalStyles=True,
     withNormalizeCSS=True,

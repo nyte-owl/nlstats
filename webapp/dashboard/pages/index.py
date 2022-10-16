@@ -2,19 +2,17 @@ from functools import lru_cache
 from typing import List
 
 from dash import dcc, html, Input, Output, callback
-from dash_bootstrap_templates import load_figure_template
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 import plotly.express as px
 
 from .. import data
 
-load_figure_template("darkly")
-
 fig_views_over_time = px.scatter(
     data.df_views_over_time,
     x="Publish Date",
     y="Views",
+    template="plotly_dark",
     log_y=True,
     trendline="rolling",
     trendline_options=dict(window=10),
@@ -101,6 +99,7 @@ def generate_figure(games_selection):
         filtered_videos,
         x="Publish Date",
         y="Views",
+        template="plotly_dark",
         log_y=True,
         size="Likes per 1000 Views",
         color="Game",
