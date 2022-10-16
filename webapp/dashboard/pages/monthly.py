@@ -113,7 +113,12 @@ def get_content(date_picked: date):
     )
     df_game_count.loc[df_game_count["Count"] == 1, "Game"] = "'Other' Games"
 
-    pie_game_count = px.pie(df_game_count, values="Count", names="Game")
+    pie_game_count = px.pie(
+        df_game_count,
+        values="Count",
+        names="Game",
+        template="plotly_dark",
+    )
     pie_game_count.update_layout(
         legend_borderwidth=2,
         paper_bgcolor="rgba(0,0,0,0)",
@@ -134,7 +139,13 @@ def get_content(date_picked: date):
     )
     df_post_history = df_post_history.sort_values(by="Game")
 
-    bar_post_history = px.bar(df_post_history, x="Date", y="Count", color="Game")
+    bar_post_history = px.bar(
+        df_post_history,
+        x="Date",
+        y="Count",
+        color="Game",
+        template="plotly_dark",
+    )
     bar_post_history.update_layout(
         legend_borderwidth=2,
         paper_bgcolor="rgba(0,0,0,0)",
