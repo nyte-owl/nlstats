@@ -13,10 +13,14 @@ class GeneralSettings(BaseSettings):
     db_host: str
     db_name: str
 
+    gtag_analytics_code: str
+
     start_date: str = "2019-06-01"
 
     heroku_app_name: str = "nlstats"
     heroku_oauth_token: str
+
+    custom_url: str = "https://www.nlstats.com/"
 
     local_development: bool = False
 

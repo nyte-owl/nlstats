@@ -7,21 +7,65 @@ from data import crud
 from webapp.dashboard import pages, content
 import config
 
+import log
+
+logger = log.get_logger(__name__)
+
 google_fonts_stylesheet = (
     "https://fonts.googleapis.com/css2?"
     "family=Inter:wght@100;200;300;400;500;900&display=swap"
 )
+
+title = "NL Stats"
+description = "See the latest stats and trends for the NorthernLion YouTube channel."
+
 app = Dash(
     __name__,
     title="NL Stats",
     external_stylesheets=[google_fonts_stylesheet],
+    meta_tags=[
+        {"name": "title", "content": title},
+        {"name": "description", "content": description},
+    ],
 )
 app.config.suppress_callback_exceptions = True
+
+gtag_js_url = (
+    f"https://www.googletagmanager.com/gtag/js?id={config.settings.gtag_analytics_code}"
+)
+preview_image = config.settings.custom_url.rstrip("/") + app.get_asset_url(
+    "preview_image.png"
+)
+logger.info(f"{preview_image=}")
 app.index_string = f"""
 <!DOCTYPE html>
 <html>
     <head>
+        <!-- Google tag (gtag.js) -->
+        <script async src="{gtag_js_url}"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){{dataLayer.push(arguments);}}
+        gtag('js', new Date());
+
+        gtag('config', '{config.settings.gtag_analytics_code}');
+        </script>
+
         {{%metas%}}
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{config.settings.custom_url}">
+        <meta property="og:title" content="{title}">
+        <meta property="og:description" content="{description}">
+        <meta property="og:image" content="{preview_image}">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="{config.settings.custom_url}">
+        <meta property="twitter:title" content="{title}">
+        <meta property="twitter:description" content="{description}">
+        <meta property="twitter:image" content="{preview_image}">
+
         <title>{{%title%}}</title>
         {{%favicon%}}
         {{%css%}}
