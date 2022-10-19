@@ -149,6 +149,7 @@ df_top_monthly = (
     .head(1)
     .reset_index()
     .set_index("Publish Date")
+    .sort_index(ascending=False)
 )
 total_videos_monthly = (
     df_videos.groupby([monthly])["Game"].count().rename("Total Videos").to_frame()

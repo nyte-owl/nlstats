@@ -60,7 +60,7 @@ all_boards = {
         "tab": LeaderboardTab.activity,
     },
     "most_published_monthly": {
-        "df": data.df_top_monthly.tail(n=24),
+        "df": data.df_top_monthly.head(n=24),
         "label": "Most Published Game - Monthly",
         "tab": LeaderboardTab.activity,
     },
