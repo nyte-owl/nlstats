@@ -24,11 +24,6 @@ df_videos["Duration"] = df_videos["Duration (Seconds)"].apply(convert_seconds)
 all_games = df_videos.groupby("Game")["Title"].count().sort_values(ascending=False)
 most_uploaded = df_videos["Game"].value_counts().index.tolist()[:4]
 
-df_views_over_time = (
-    df_videos.set_index("Publish Date")[["Views"]].resample("W").sum().reset_index()
-)
-
-
 df_per_game_stats = (
     df_videos[["Likes", "Views", "Game"]].groupby("Game").agg(["sum", "count"])
 )

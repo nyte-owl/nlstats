@@ -5,18 +5,22 @@ from dash import dcc, html, Input, Output, callback
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 import plotly.express as px
+import plotly.graph_objects as go
 
-from .. import data
+from . import page_data
+from ... import data
+
+CHART_HEIGHT = 600
 
 fig_views_over_time = px.scatter(
-    data.df_views_over_time,
+    page_data.df_views_over_time,
     x="Publish Date",
     y="Views",
     template="plotly_dark",
     log_y=True,
     trendline="rolling",
     trendline_options=dict(window=10),
-    height=500,
+    height=CHART_HEIGHT,
 )
 
 fig_views_over_time.update_layout(
@@ -25,15 +29,59 @@ fig_views_over_time.update_layout(
     plot_bgcolor="rgba(0,0,0,0)",
 )
 
+fig_new_series_trend = px.line(
+    page_data.df_small_game_series_video_stats,
+    x="Video #",
+    y="Cumulative Views",
+    template="plotly_dark",
+    color="Game",
+    log_y=True,
+    markers=True,
+    hover_data=["Title", "Publish Date", "Views"],
+    height=CHART_HEIGHT,
+)
+fig_new_series_trend.update_layout(
+    transition_duration=1000,
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+    hovermode="x",
+)
+fig_new_series_trend.add_trace(
+    go.Scatter(
+        x=page_data.middle_50_x,
+        y=page_data.middle_50_y,
+        fill="toself",
+        fillcolor="rgba(243,215,200,0.3)",
+        line_color="rgba(255,255,255,0)",
+        name="Middle 50%",
+        hoverinfo="none",
+    )
+)
+
+
 layout = html.Div(
-    style={
-        "textAlign": "center",
-    },
     children=[
+        dmc.Title("New Game Series Trends", order=1),
+        html.P(
+            "This shows the performance of newly-posted (within the last 3 weeks) "
+            "game series.  It shows the cumulative view counts of the series for each "
+            "successive video.  The shaded area represents the 'Middle 50%' of all "
+            "game series performance. Values above the shaded area are in the Top 25% "
+            "of cumulative views, while values below the shaded area are in the Bottom "
+            "25%."
+        ),
+        dmc.LoadingOverlay(
+            children=[
+                dcc.Graph(figure=fig_new_series_trend),
+            ],
+        ),
+        html.Br(),
+        dmc.Divider(variant="dashed", size="md"),
         dmc.Title("Video View Count", order=1),
         html.P(
             children=(
-                "This graph shows how many views NL's videos have accrued to date.  "
+                "This shows how many views NL's videos have accrued to date.  "
                 "The size of the points represent the number of likes each video "
                 "received."
             ),
@@ -72,7 +120,7 @@ layout = html.Div(
         html.Br(),
         dmc.Title("Total Views Over Time (Weekly)", order=1),
         html.P(
-            "This graph presents the total views (today) of all videos posted "
+            "This presents the total views (today) of all videos posted "
             "in a given week.  NOTE: There is a bias towards older videos as newer "
             "videos have not had as much time to accumulate views. This is especially "
             "true for videos that are only a few days old."
@@ -105,7 +153,7 @@ def generate_figure(games_selection):
         color="Game",
         # trendline="rolling",
         # trendline_options=dict(window=7),
-        height=500,
+        height=CHART_HEIGHT,
         hover_data=["Title"],
         category_orders={"Game": games_selection},
     )
