@@ -98,9 +98,9 @@ tz = pytz.timezone("America/New_York")
 dt_est = date_pulled.astimezone(tz)
 
 footer_notes = [
-    "Content is updated daily at 2:05AM ET.",
-    f"Data includes only videos posted since {config.settings.start_date}.",
     f"All data is current as of {dt_est:{date_format}}",
+    f"Data includes only videos posted since {config.settings.start_date}.",
+    "Content is updated daily at 1:05AM EST.",
 ]
 
 footer = []

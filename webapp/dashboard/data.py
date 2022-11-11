@@ -1,31 +1,73 @@
 from datetime import timedelta
+import math
 from typing import List
 
 import pandas as pd
 import numpy as np
 
 from data import crud
+from log import get_logger
+
+logger = get_logger(__name__)
 
 
 def convert_seconds(seconds):
     return str(timedelta(seconds=seconds))
 
 
-df_videos = crud.processed_stat.get_most_recent_processed_stat_dataframe()
-df_videos["Likes per 1000 Views"] = (
-    df_videos["Likes"] / (df_videos["Views"] / 1000)
+earliest_pull_date = crud.collection_event.get_earliest_event()
+
+# -- All Video Stats --
+logger.info("Creating 'All Video' stats")
+df_all_video_stats = crud.processed_stat.get_all_stats()
+df_all_video_stats["Likes per 1000 Views"] = df_all_video_stats["Likes"] / (
+    df_all_video_stats["Views"] / 1000
+)
+df_all_video_stats["Comments per 1000 Views"] = df_all_video_stats["Comments"] / (
+    df_all_video_stats["Views"] / 1000
+)
+df_all_video_stats["Publish Date"] = df_all_video_stats["Publish Date"].dt.tz_localize(
+    "UTC"
+)
+df_all_video_stats["Time Elapsed"] = (
+    df_all_video_stats["Pull Date"] - df_all_video_stats["Publish Date"]
+)
+df_all_video_stats["Days Elapsed"] = (
+    df_all_video_stats["Time Elapsed"]
+    .apply(lambda et: et.total_seconds() / 86400)
+    .round(decimals=1)
+)
+df_all_video_stats = df_all_video_stats.sort_values(by="Pull Date")
+df_all_video_stats = df_all_video_stats[
+    df_all_video_stats["Publish Date"] >= earliest_pull_date
+]
+num_bins = math.ceil(df_all_video_stats["Days Elapsed"].max())
+df_all_video_stats["Bin"] = pd.cut(df_all_video_stats["Days Elapsed"], bins=num_bins)
+
+
+# -- Latest Video Stats --
+logger.info("Creating 'Latest Video' stats")
+df_latest_video_stats = crud.processed_stat.get_most_recent_processed_stat_dataframe()
+df_latest_video_stats["Likes per 1000 Views"] = (
+    df_latest_video_stats["Likes"] / (df_latest_video_stats["Views"] / 1000)
 ).round(3)
-df_videos["Comments per 1000 Views"] = (
-    df_videos["Comments"] / (df_videos["Views"] / 1000)
+df_latest_video_stats["Comments per 1000 Views"] = (
+    df_latest_video_stats["Comments"] / (df_latest_video_stats["Views"] / 1000)
 ).round(3)
 
 
-df_videos["Duration"] = df_videos["Duration (Seconds)"].apply(convert_seconds)
-all_games = df_videos.groupby("Game")["Title"].count().sort_values(ascending=False)
-most_uploaded = df_videos["Game"].value_counts().index.tolist()[:4]
+df_latest_video_stats["Duration"] = df_latest_video_stats["Duration (Seconds)"].apply(
+    convert_seconds
+)
+all_games = (
+    df_latest_video_stats.groupby("Game")["Title"].count().sort_values(ascending=False)
+)
+most_uploaded = df_latest_video_stats["Game"].value_counts().index.tolist()[:4]
 
 df_per_game_stats = (
-    df_videos[["Likes", "Views", "Game"]].groupby("Game").agg(["sum", "count"])
+    df_latest_video_stats[["Likes", "Views", "Game"]]
+    .groupby("Game")
+    .agg(["sum", "count"])
 )
 df_per_game_stats.columns = df_per_game_stats.columns.map("_".join)
 
@@ -102,21 +144,21 @@ df_most_published_games = obtain_ranked_df(
 )
 
 df_most_viewed_videos = obtain_ranked_df(
-    df=df_videos,
+    df=df_latest_video_stats,
     rank_by_col="Views",
     columns_shown=["id", "Title", "Publish Date", "Views"],
     str_conv_col="Views",
 )
 
 df_longest_videos = obtain_ranked_df(
-    df=df_videos,
+    df=df_latest_video_stats,
     rank_by_col="Duration (Seconds)",
     columns_shown=["id", "Title", "Publish Date", "Views", "Duration"],
     str_conv_col="Views",
 )
 
 df_video_highest_like_rate = obtain_ranked_df(
-    df=df_videos,
+    df=df_latest_video_stats,
     rank_by_col="Likes per 1000 Views",
     columns_shown=["id", "Title", "Publish Date", "Likes per 1000 Views", "Views"],
 )
@@ -141,7 +183,7 @@ df_biggest_like_getters = obtain_ranked_df(
 
 monthly = pd.Grouper(key="Publish Date", freq="M")
 df_top_monthly = (
-    df_videos.groupby([monthly])["Game"]
+    df_latest_video_stats.groupby([monthly])["Game"]
     .value_counts()
     .rename("Game Count")
     .to_frame()
@@ -152,7 +194,10 @@ df_top_monthly = (
     .sort_index(ascending=False)
 )
 total_videos_monthly = (
-    df_videos.groupby([monthly])["Game"].count().rename("Total Videos").to_frame()
+    df_latest_video_stats.groupby([monthly])["Game"]
+    .count()
+    .rename("Total Videos")
+    .to_frame()
 )
 df_top_monthly = df_top_monthly.join(total_videos_monthly).reset_index()
 

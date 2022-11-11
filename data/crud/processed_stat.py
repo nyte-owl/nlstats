@@ -4,10 +4,11 @@ import pandas as pd
 from pydantic import BaseModel
 from sqlalchemy import select
 
+from log import get_logger
 from .. import crud
 from ..database import get_session
-from log import get_logger
-from ..mappers import ProcessedStat, Video
+from ..mappers import CollectionEvent, ProcessedStat, Video
+
 
 logger = get_logger(__name__)
 
@@ -55,6 +56,35 @@ def get_most_recent_processed_stat_dataframe() -> pd.DataFrame:
         select(list(columns.values()))
         .where(ProcessedStat.collection_event_id == most_recent_collection_event.id)
         .join(ProcessedStat.video_info)
+    )
+
+    with get_session() as session:
+        data = session.execute(query).all()
+
+    return pd.DataFrame(
+        data,
+        columns=list(columns.keys()),
+    )
+
+
+def get_all_stats() -> pd.DataFrame:
+    columns = {
+        "id": Video.unique_youtube_id,
+        "Publish Date": Video.publish_date,
+        "Title": Video.title,
+        "Description": Video.description,
+        "Duration (Seconds)": Video.duration_seconds,
+        "Game": Video.game,
+        "Likes": ProcessedStat.likes,
+        "Views": ProcessedStat.views,
+        "Comments": ProcessedStat.comments,
+        "Pull Date": CollectionEvent.pull_datetime,
+        "Collection Event": CollectionEvent.id,
+    }
+    query = (
+        select(list(columns.values()))
+        .join(ProcessedStat.video_info)
+        .join(ProcessedStat.collection_event)
     )
 
     with get_session() as session:

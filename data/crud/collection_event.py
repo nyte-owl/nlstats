@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import select
 
 from ..database import get_session
@@ -5,6 +6,17 @@ from log import get_logger
 from ..mappers import CollectionEvent
 
 logger = get_logger(__name__)
+
+
+def get_earliest_event() -> datetime:
+    with get_session() as session:
+        return (
+            session.execute(
+                select(CollectionEvent.pull_datetime).where(CollectionEvent.complete)
+            )
+            .scalars()
+            .first()
+        )
 
 
 def create_collection_event() -> CollectionEvent:
@@ -35,7 +47,7 @@ def update_collection_event_as_complete(collection_event_id: int):
 def get_most_recent_collection_event() -> CollectionEvent:
     query = (
         select(CollectionEvent)
-        .where(CollectionEvent.complete == True)
+        .where(CollectionEvent.complete)
         .order_by(CollectionEvent.pull_datetime.desc())
     )
 

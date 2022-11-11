@@ -60,9 +60,9 @@ def create_stat_card(
 
 
 def get_content(date_picked: date):
-    df = data.df_videos[
-        (data.df_videos["Publish Date"].dt.month == date_picked.month)
-        & (data.df_videos["Publish Date"].dt.year == date_picked.year)
+    df = data.df_latest_video_stats[
+        (data.df_latest_video_stats["Publish Date"].dt.month == date_picked.month)
+        & (data.df_latest_video_stats["Publish Date"].dt.year == date_picked.year)
     ]
 
     by_game_accordion = []
