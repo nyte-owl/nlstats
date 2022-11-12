@@ -150,6 +150,8 @@ def display_page(pathname):
         return pages.monthly.layout
     elif pathname == "/leaderboards":
         return pages.leaderboards.layout
+    elif pathname == "/library":
+        return pages.library.layout
     else:
         return html.P(f"404 - Not Found: {pathname}")
 

@@ -35,6 +35,20 @@ def create_processed_stats(new_items: List[CreateProcessedStat]):
 
 
 def get_most_recent_processed_stat_dataframe() -> pd.DataFrame:
+    """
+    Columns:
+    - "id"
+    - "Publish Date"
+    - "Title"
+    - "Description"
+    - "Duration (Seconds)"
+    - "Game"
+    - "Likes"
+    - "Views"
+    - "Comments"
+    - "Likes per 1000 Views"
+    - "Comments per 1000 Views"
+    """
     most_recent_collection_event = (
         crud.collection_event.get_most_recent_collection_event()
     )

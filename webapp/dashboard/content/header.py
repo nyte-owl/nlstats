@@ -55,6 +55,7 @@ def make_navbar(logo_url: str) -> dmc.Header:
                 make_header_link(
                     "Monthly Reports", "/monthly", "ant-design:calendar-outlined"
                 ),
+                make_header_link("Library", "/library", "ic:baseline-video-library"),
             ],
         ),
         style={"height": f"{logo_size_pixels}px"},
