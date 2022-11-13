@@ -129,20 +129,14 @@ def load_more_videos(n_clicks: int, games: List[str], old_output):
     else:
         df_selected = df_videos
 
-    logger.debug(f"{len(df_selected)=}")
-    logger.debug(f"{ctx.triggered_id=}")
-
     if ctx.triggered_id == "load-button":
         page_start = n_clicks * 20
         page_end = page_start + 20
 
-        logger.debug("load-button")
         return old_output + create_cards_from_df(
             df_selected.iloc[page_start:page_end], by_week=bool(games)
         )
     elif ctx.triggered_id == "game-select":
-        logger.debug("game-select")
         return create_cards_from_df(df_selected.head(n=20), by_week=bool(games))
     else:
-        logger.debug("none")
         return create_cards_from_df(df_selected.head(n=20), by_week=bool(games))
