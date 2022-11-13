@@ -101,7 +101,7 @@ layout = dmc.Stack(
                         "Game ",
                         DashIconify(icon="carbon:game-console"),
                     ],
-                    data=df_videos["Game"].sort_values().unique().tolist(),
+                    data=data.all_games.index.to_list(),
                     searchable=True,
                     nothingFound="No games found",
                     size="xl",
