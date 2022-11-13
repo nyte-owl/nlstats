@@ -209,3 +209,5 @@ df_top_monthly["Publish Date"] = df_top_monthly["Publish Date"].apply(
 )
 
 df_top_monthly = df_top_monthly.rename({"Publish Date": "Month"}, axis=1)
+
+logger.info("Done")
