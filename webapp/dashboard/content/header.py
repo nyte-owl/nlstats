@@ -48,7 +48,7 @@ def make_navbar(logo_url: str) -> dmc.Header:
             align="center",
             spacing="xl",
             children=[
-                make_header_link("Home", "/", "bi:house-door"),
+                # make_header_link("Home", "/", "bi:house-door"),
                 make_header_link(
                     "Leaderboards", "/leaderboards", "ant-design:ordered-list-outlined"
                 ),
