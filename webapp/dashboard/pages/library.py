@@ -158,6 +158,7 @@ def create_cards_from_df(
 
     else:
         skip = page * VIDEOS_PER_PAGE
+        video_count = len(df)
         df = df.sort_values(by=sorts[sort_selection], ascending=sort_ascending).iloc[
             skip : skip + 20
         ]
@@ -175,7 +176,7 @@ def create_cards_from_df(
             )
         )
 
-        on_last_page = skip + 20 >= len(df)
+        on_last_page = skip + 20 >= video_count
 
     return output, on_last_page
 
