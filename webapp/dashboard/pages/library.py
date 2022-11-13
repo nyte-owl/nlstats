@@ -2,7 +2,7 @@ from typing import List
 
 import dash_mantine_components as dmc
 import pandas as pd
-from dash import Input, Output, State, callback, ctx, html
+from dash import Input, Output, State, callback, ctx, html, no_update
 from dash_iconify import DashIconify
 
 import log
@@ -46,7 +46,12 @@ def create_video_card(video: pd.Series):
     return paper
 
 
-def create_cards_from_df(df: pd.DataFrame, by_week: bool = False):
+def create_cards_from_df(df: pd.DataFrame, page: int | None, by_week: bool = False):
+    if page is None:
+        page = 0
+
+    VIDEOS_PER_PAGE = 20
+
     if by_week:
         pre_text = "Week ending "
         freq = "W"
@@ -56,13 +61,25 @@ def create_cards_from_df(df: pd.DataFrame, by_week: bool = False):
 
     day_grouper = pd.Grouper(key="Publish Date", freq=freq)
     output = []
+    current_page_count = 0
+    current_skip_count = 0
     for day, frame in reversed(list(df.groupby(day_grouper, sort=False))):
+        publish_date: pd.Timestamp = day
+        publish_date = publish_date.strftime("%Y-%m-%d")
+
+        logger.debug(
+            f"{publish_date=}, {current_skip_count=}, {current_page_count=}, "
+            f"{len(frame)=}"
+        )
         if frame.empty:
             continue
 
+        if current_skip_count < (page * VIDEOS_PER_PAGE):
+            current_skip_count += len(frame)
+            current_page_count += len(frame)
+            continue
+
         frame = frame.sort_values(by="Publish Date", ascending=False)
-        publish_date: pd.Timestamp = day
-        publish_date = publish_date.strftime("%Y-%m-%d")
         publish_text = pre_text + publish_date
         output.append(
             dmc.Divider(
@@ -87,6 +104,12 @@ def create_cards_from_df(df: pd.DataFrame, by_week: bool = False):
                 style={"margin-bottom": "20px"},
             )
         )
+
+        current_page_count += len(frame)
+        if current_page_count >= (VIDEOS_PER_PAGE * (page + 1)):
+            break
+
+    logger.debug(f"-- {current_skip_count=}, {current_page_count=} --")
     return output
 
 
@@ -119,6 +142,7 @@ layout = dmc.Stack(
 
 @callback(
     Output(d_content, "children"),
+    Output(d_load_button, "n_clicks"),
     Input(d_load_button, "n_clicks"),
     Input(d_game_selector, "value"),
     State(d_content, "children"),
@@ -130,13 +154,33 @@ def load_more_videos(n_clicks: int, games: List[str], old_output):
         df_selected = df_videos
 
     if ctx.triggered_id == "load-button":
-        page_start = n_clicks * 20
-        page_end = page_start + 20
+        new_cards = create_cards_from_df(
+            df_selected,
+            page=n_clicks,
+            by_week=bool(games),
+        )
 
-        return old_output + create_cards_from_df(
-            df_selected.iloc[page_start:page_end], by_week=bool(games)
+        return (
+            old_output + new_cards,
+            no_update,
         )
     elif ctx.triggered_id == "game-select":
-        return create_cards_from_df(df_selected.head(n=20), by_week=bool(games))
+        new_cards = create_cards_from_df(
+            df_selected,
+            page=0,
+            by_week=bool(games),
+        )
+        return (
+            new_cards,
+            0,
+        )
     else:
-        return create_cards_from_df(df_selected.head(n=20), by_week=bool(games))
+        new_cards = create_cards_from_df(
+            df_selected,
+            page=0,
+            by_week=bool(games),
+        )
+        return (
+            new_cards,
+            0,
+        )
