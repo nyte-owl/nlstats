@@ -97,10 +97,6 @@ layout = dmc.Stack(
             [
                 d_game_selector := dmc.MultiSelect(
                     icon=[DashIconify(icon="cil:magnifying-glass")],
-                    label=[
-                        "Game ",
-                        DashIconify(icon="carbon:game-console"),
-                    ],
                     data=data.all_games.index.to_list(),
                     searchable=True,
                     nothingFound="No games found",
