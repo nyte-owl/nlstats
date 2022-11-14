@@ -182,6 +182,7 @@ def create_cards_from_df(
 
 
 modal = dmc.Modal(
+    zIndex=2,
     title="Select Filter",
     id="modal",
     children=[
@@ -190,11 +191,49 @@ modal = dmc.Modal(
             " page."
         ),
         d_views_scatter := dcc.Graph(id="views-scatter"),
-        d_clear_selection := dmc.Button("Clear Selection"),
+        dmc.Group(
+            children=[
+                d_clear_selection := dmc.Button(
+                    "Clear Selection", color="red", variant="outline"
+                ),
+                d_submit_selection := dmc.Button("Submit"),
+            ],
+            position="apart",
+            align="flex-start",
+        ),
     ],
     size="70%",
     centered=True,
 )
+
+
+def create_skeleton_card():
+    return dmc.Paper(
+        children=dmc.Group(
+            direction="column",
+            grow=True,
+            spacing="xs",
+            children=[
+                dmc.Skeleton(height=150, width=280),
+                dmc.Skeleton(height=10),
+                dmc.Skeleton(height=10, width="50%"),
+                dmc.Skeleton(height=8, width="20%"),
+                dmc.Skeleton(height=8, width="70%"),
+                dmc.Skeleton(height=8, width="70%"),
+            ],
+        ),
+        withBorder=True,
+        px="md",
+        py="xs",
+        style={
+            "backgroundColor": dmc.theme.DEFAULT_COLORS["dark"][6],
+            "border-color": dmc.theme.DEFAULT_COLORS["dark"][3],
+            "margin-left": "auto",
+            "margin-right": "auto",
+        },
+        shadow="md",
+    )
+
 
 layout = dmc.Stack(
     [
@@ -244,9 +283,22 @@ layout = dmc.Stack(
             align="flex-start",
         ),
         dmc.LoadingOverlay(
-            d_content := html.Div(),
+            d_content := html.Div(
+                dmc.SimpleGrid(
+                    children=[create_skeleton_card() for _ in range(10)],
+                    cols=4,
+                    spacing="md",
+                    breakpoints=[
+                        {"maxWidth": "xl", "cols": 3},
+                        {"maxWidth": "lg", "cols": 2},
+                        {"maxWidth": "sm", "cols": 1},
+                    ],
+                    style={"margin-bottom": "20px"},
+                )
+            ),
             loaderProps={"variant": "dots", "color": "red", "size": "xl"},
             style={"align-items": "start"},
+            zIndex=1,
         ),
         dmc.Center(
             d_load_button := dmc.Button(
@@ -280,6 +332,7 @@ def generate_views_scatter_figure(df: pd.DataFrame):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
         dragmode="select",
     )
+    logger.debug("Created figure")
     return fig
 
 
@@ -312,7 +365,8 @@ def load_more_videos(
 
     selection_empty = selection_is_empty(selected_data)
     logger.info(
-        f">>>>> Load More Videos -- {n_clicks_load_more=}, {games=}, {selection_empty=}"
+        f">>>>> Load More Videos -- {ctx.triggered_id=}, {n_clicks_load_more=}, "
+        f"{games=}"
     )
     if games:
         df_selected = df_videos[df_videos["Game"].isin(games)]
@@ -335,6 +389,9 @@ def load_more_videos(
             page=n_clicks_load_more,
             frequency=freq,
         )
+
+        if old_output is None:
+            old_output = []
 
         return (
             old_output + new_cards,
@@ -360,7 +417,6 @@ def load_more_videos(
 
 @callback(
     Output(d_views_scatter, "figure"),
-    Output(d_views_scatter, "selectedData"),
     Input(d_game_selector, "value"),
     Input(d_clear_selection, "n_clicks"),
 )
@@ -373,22 +429,35 @@ def update_views_scatter(games: List[str], clear_n_clicks):
 
     figure = generate_views_scatter_figure(df_selected)
 
-    return figure, None
+    return figure
+
+
+@callback(
+    Output(d_views_scatter, "selectedData"),
+    Input(d_game_selector, "value"),
+    Input(d_clear_selection, "n_clicks"),
+)
+def clear_selection_data(games: List[str], clear_n_clicks):
+    logger.info(">>>>> Clear scatter selection")
+
+    return None
 
 
 @callback(
     Output(modal, "opened"),
     Input(d_open_modal, "n_clicks"),
+    Input(d_submit_selection, "n_clicks"),
     State(modal, "opened"),
     prevent_initial_call=True,
 )
-def toggle_modal(n_clicks, opened):
+def toggle_modal(n_open, n_submit, opened):
     return not opened
 
 
 @callback(
     Output(d_clear_selection, "disabled"),
     Output(d_open_modal, "variant"),
+    Output(d_open_modal, "leftIcon"),
     Input(d_views_scatter, "selectedData"),
 )
 def enable_clear_selection_button(selected_data):
@@ -396,10 +465,12 @@ def enable_clear_selection_button(selected_data):
 
     if selection_is_empty(selected_data):
         variant = "outline"
+        icon = None
     else:
         variant = "filled"
+        icon = DashIconify(icon="ci:filter")
 
-    return selection_is_empty(selected_data), variant
+    return selection_is_empty(selected_data), variant, icon
 
 
 @callback(Output(d_sort_direction, "children"), Input(d_sort_direction, "n_clicks"))

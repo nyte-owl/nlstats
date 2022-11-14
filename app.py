@@ -9,7 +9,7 @@ import config
 
 import log
 
-logger = log.get_logger(__name__)
+logger = log.get_logger("Main App")
 
 google_fonts_stylesheet = (
     "https://fonts.googleapis.com/css2?"
@@ -142,6 +142,7 @@ app.layout = dmc.MantineProvider(
 
 @callback(Output(div_page_content, "children"), Input(d_url, "pathname"))
 def display_page(pathname):
+    logger.info(f"Page: {pathname}")
     if pathname == "/":
         return pages.index.layout
     elif pathname == "/health":
