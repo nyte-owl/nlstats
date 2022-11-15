@@ -7,6 +7,7 @@ import numpy as np
 
 from data import crud
 from log import get_logger
+from config import settings
 
 logger = get_logger(__name__)
 
@@ -29,6 +30,9 @@ df_all_video_stats["Comments per 1000 Views"] = df_all_video_stats["Comments"] /
 df_all_video_stats["Publish Date"] = df_all_video_stats["Publish Date"].dt.tz_localize(
     "UTC"
 )
+df_all_video_stats = df_all_video_stats[
+    df_all_video_stats["Publish Date"] >= settings.start_date
+]
 df_all_video_stats["Time Elapsed"] = (
     df_all_video_stats["Pull Date"] - df_all_video_stats["Publish Date"]
 )
@@ -55,6 +59,9 @@ df_latest_video_stats["Comments per 1000 Views"] = (
     df_latest_video_stats["Comments"] / (df_latest_video_stats["Views"] / 1000)
 ).round(3)
 
+df_latest_video_stats = df_latest_video_stats[
+    df_latest_video_stats["Publish Date"] >= settings.start_date
+]
 
 df_latest_video_stats["Duration"] = df_latest_video_stats["Duration (Seconds)"].apply(
     convert_seconds
