@@ -39,22 +39,48 @@ def clean_video_data(df_videos: pd.DataFrame):
     )
 
     def parse_title(title: str):
-        matches = re.findall(r"[^|]+ \|([^#(]+)", title)
-        if "Northernlion Live Super Show" in title:
+        if (
+            "Northernlion Live Super Show" in title
+            or "Northernlion Live Pseudo Show" in title
+        ):
             return None
 
+        # e.g. `Northernlion Plays: Pokemon Let's Go Pikachu [...`
+        matches = re.findall(r"Northernlion Plays: ([^\[\(|]+)", title)
+        if matches:
+            return matches[0].strip()
+
+        # e.g. `The Binding of Isaac: AFTERBIRTH+ - Northernlion Plays - Episode 1344
+        # (Motto)`
+        matches = re.findall(r"([^-]+) - Northernlion Plays", title)
+        if matches:
+            return matches[0].strip()
+
+        # e.g. `Northernlion Plays - D4: Dark Dreams Don't Die [Episode 6] (Twitch VOD)`
+        matches = re.findall(r"Northernlion Plays - ([^\[\(|]+)", title)
+        if matches:
+            return matches[0].strip()
+
+        # e.g. `An Alternative XCOM | Gears Tactics (Northernlion Tries)`
+        matches = re.findall(r"[^|]+ \|([^#(]+)", title)
         if matches:
             return matches[-1].strip()
-        else:
-            matches = re.findall(r"[^(]+\(([^#)]*?)\)", title)
+
+        # e.g. `Consider My Timbers Shivered - Pirate Outlaws (Northernlion Tries)`
+        if "Northernlion Tries" in title:
+            matches = re.findall(r"[^-]+ -+([^#(]+)", title)
             if matches:
-                if "Episode" in matches[-1]:
-                    if ":" in matches[-1] and "Episode" in matches[-1].split(":")[1]:
-                        return matches[-1].split(":")[0].strip()
-                    return title.split(" (")[0]
                 return matches[-1].strip()
 
-            return None
+        matches = re.findall(r"[^(]+\(([^#)]*?)\)", title)
+        if matches:
+            if "Episode" in matches[-1]:
+                if ":" in matches[-1] and "Episode" in matches[-1].split(":")[1]:
+                    return matches[-1].split(":")[0].strip()
+                return title.split(" (")[0]
+            return matches[-1].strip()
+
+        return None
 
     df_videos["game"] = df_videos["snippet-title"].apply(parse_title)
     df_videos["snippet-publishedAt"] = pd.to_datetime(
