@@ -190,7 +190,7 @@ modal = dmc.Modal(
             "You can drag and select points on the graph to filter the results on this"
             " page."
         ),
-        d_views_scatter := dcc.Graph(id="views-scatter"),
+        dmc.LoadingOverlay(d_views_scatter := dcc.Graph(id="views-scatter")),
         dmc.Group(
             children=[
                 d_clear_selection := dmc.Button(
