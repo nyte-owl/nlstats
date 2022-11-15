@@ -190,7 +190,14 @@ modal = dmc.Modal(
             "You can drag and select points on the graph to filter the results on this"
             " page."
         ),
-        dmc.LoadingOverlay(d_views_scatter := dcc.Graph(id="views-scatter"), zIndex=3),
+        html.Div(
+            [
+                d_graph_skeleton := dmc.Skeleton(height=400, width="100%"),
+                d_views_scatter := dcc.Graph(
+                    id="views-scatter", style={"display": "none"}
+                ),
+            ]
+        ),
         dmc.Group(
             children=[
                 d_clear_selection := dmc.Button(
@@ -332,7 +339,6 @@ def generate_views_scatter_figure(df: pd.DataFrame):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
         dragmode="select",
     )
-    logger.debug("Created figure")
     return fig
 
 
@@ -365,8 +371,8 @@ def load_more_videos(
 
     selection_empty = selection_is_empty(selected_data)
     logger.info(
-        f">>>>> Load More Videos -- {ctx.triggered_id=}, {n_clicks_load_more=}, "
-        f"{games=}"
+        f"[Library] Load More Videos -- {n_clicks_load_more=}, {games=}, "
+        f"{sort_selection=}"
     )
     if games:
         df_selected = df_videos[df_videos["Game"].isin(games)]
@@ -417,11 +423,13 @@ def load_more_videos(
 
 @callback(
     Output(d_views_scatter, "figure"),
+    Output(d_views_scatter, "style"),
+    Output(d_graph_skeleton, "style"),
     Input(d_game_selector, "value"),
     Input(d_clear_selection, "n_clicks"),
 )
 def update_views_scatter(games: List[str], clear_n_clicks):
-    logger.info(f">>>>> Update views scatter -- {games=}")
+    logger.info(f"[Library] Update views scatter -- {games=}")
     if games:
         df_selected = df_videos[df_videos["Game"].isin(games)]
     else:
@@ -429,7 +437,7 @@ def update_views_scatter(games: List[str], clear_n_clicks):
 
     figure = generate_views_scatter_figure(df_selected)
 
-    return figure
+    return figure, {}, {"display": "none"}
 
 
 @callback(
@@ -438,7 +446,7 @@ def update_views_scatter(games: List[str], clear_n_clicks):
     Input(d_clear_selection, "n_clicks"),
 )
 def clear_selection_data(games: List[str], clear_n_clicks):
-    logger.info(">>>>> Clear scatter selection")
+    logger.info("[Library] Clear scatter selection")
 
     return None
 
@@ -461,7 +469,7 @@ def toggle_modal(n_open, n_submit, opened):
     Input(d_views_scatter, "selectedData"),
 )
 def enable_clear_selection_button(selected_data):
-    logger.info(">>>> clear button")
+    logger.info("[Library] clear button")
 
     if selection_is_empty(selected_data):
         variant = "outline"
