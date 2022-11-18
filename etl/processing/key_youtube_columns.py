@@ -115,7 +115,7 @@ def clean_video_data(df_videos: pd.DataFrame):
         for regex_pat in simple_regex_attempts:
             matches = re.findall(regex_pat, title)
             if matches:
-                return matches[0].strip()
+                return matches[0].strip().strip("!")
 
         # e.g. `Consider My Timbers Shivered - Pirate Outlaws (Northernlion Tries)`
         if "Northernlion Tries" in title:
