@@ -28,7 +28,7 @@ df_all_video_stats["Comments per 1000 Views"] = df_all_video_stats["Comments"] /
     df_all_video_stats["Views"] / 1000
 )
 df_all_video_stats["Publish Date"] = df_all_video_stats["Publish Date"].dt.tz_localize(
-    "US/Eastern"
+    "US/Eastern", nonexistent="shift_forward"
 )
 df_all_video_stats = df_all_video_stats[
     df_all_video_stats["Publish Date"] >= settings.start_date
@@ -61,7 +61,7 @@ df_latest_video_stats["Comments per 1000 Views"] = (
 
 df_latest_video_stats["Publish Date"] = df_latest_video_stats[
     "Publish Date"
-].dt.tz_localize("US/Eastern")
+].dt.tz_localize("US/Eastern", nonexistent="shift_forward")
 df_latest_video_stats = df_latest_video_stats[
     df_latest_video_stats["Publish Date"] >= settings.start_date
 ]

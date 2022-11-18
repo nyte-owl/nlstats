@@ -64,7 +64,7 @@ small_game_series = counts[
 
 
 # Get list of game series that are RECENT
-today = pd.Timestamp(date.today())
+today = pd.Timestamp(date.today(), tz="US/Eastern")
 most_recent_pub_date_per_video = (
     df_latest_video_stats.groupby("Game")["Publish Date"].max().to_frame()
 )
