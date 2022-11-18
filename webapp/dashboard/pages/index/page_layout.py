@@ -1,10 +1,9 @@
 from functools import lru_cache
 from typing import List
 
-from dash import dcc, html, Input, Output, callback, no_update
+from dash import dcc, html, Input, Output, callback
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -83,7 +82,7 @@ fig_new_series_trend = create_performance_chart(
 )
 
 tab_definitions = {
-    "New Video Trends": "bx:trending-up",
+    # "New Video Trends": "bx:trending-up",
     "New Game Series Trends": "bx:trending-up",
     "Video View Count": "akar-icons:eye",
     "Total Channel Views": "akar-icons:eye",
@@ -111,6 +110,7 @@ new_video_chart_description = """
     represents the 'Middle 50%' of all game series performance. Values above the shaded
     area are in the Top 25% of cumulative views, while values below the shaded area are
     in the Bottom 25%.
+"""
 """
 new_video_trends_tab = html.Div(
     children=[
@@ -143,6 +143,7 @@ new_video_trends_tab = html.Div(
         ),
     ]
 )
+"""
 
 new_game_series_chart_description = """
     This shows the performance of newly-posted (within the last 3 weeks)
@@ -220,7 +221,8 @@ channel_views_tab = html.Div(
 )
 
 tab_contents = [
-    new_video_trends_tab,
+    # consumes too much memory
+    # new_video_trends_tab,
     new_game_series_trends_tab,
     video_views_tab,
     channel_views_tab,
@@ -234,6 +236,7 @@ layout = html.Div(
 )
 
 
+"""
 @lru_cache(maxsize=20)
 def generate_daily_chart(game_selection: str):
     df = page_data.df_new_videos_stats[
@@ -247,6 +250,7 @@ def generate_daily_chart(game_selection: str):
         middle_50_x=page_data.daily_middle_50_x,
         middle_50_y=page_data.daily_middle_50_y,
     )
+"""
 
 
 @lru_cache(maxsize=20)
@@ -294,9 +298,11 @@ def update_plotted_games(games_selection: List[str]):
         return generate_figure(tuple(games_selection))
 
 
+"""
 @callback(Output(d_daily_chart, "figure"), Input(d_daily_game_selector, "value"))
 def update_daily_chart_game(games_selection: str):
     return generate_daily_chart(games_selection)
+"""
 
 
 @callback(Output(d_content, "children"), Input(d_tabs, "active"))
@@ -304,9 +310,11 @@ def switch_views_board(active_tab: int):
     return tab_contents[active_tab]
 
 
+"""
 @callback(Output(d_daily_game_selector, "value"), Input(d_tabs, "active"))
 def select_random_game(active_tab: int):
     if active_tab == 0:
         return np.random.choice(page_data.df_new_videos_stats["Game"].unique())
     else:
         return no_update
+"""

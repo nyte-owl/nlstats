@@ -1,6 +1,6 @@
 import pandas as pd
 from pandas.tseries.offsets import DateOffset
-from datetime import date, datetime
+from datetime import date
 
 from ... import data
 
@@ -8,6 +8,8 @@ DAILY_PERFORMANCE_DAYS_MAX = 6
 SERIES_MIN_VIDEO_COUNT = 2
 SMALL_SERIES_MAX_VIDEO_COUNT = 30
 
+# Consumes too much memory
+"""
 daily_performance_stats = (
     data.df_all_video_stats.groupby("Bin")["Time Elapsed"].mean().to_frame()
 )
@@ -45,6 +47,7 @@ df_new_videos_stats: pd.DataFrame = data.df_all_video_stats[
         >= pd.Timedelta(2, "days")
     )
 ]
+"""
 
 df_views_over_time = (
     data.df_latest_video_stats.set_index("Publish Date")[["Views"]]

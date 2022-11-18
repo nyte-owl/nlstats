@@ -18,35 +18,40 @@ def convert_seconds(seconds):
 
 earliest_pull_date = crud.collection_event.get_earliest_event()
 
-# -- All Video Stats --
-logger.info("Creating 'All Video' stats")
-df_all_video_stats = crud.processed_stat.get_all_stats()
-df_all_video_stats["Likes per 1000 Views"] = df_all_video_stats["Likes"] / (
-    df_all_video_stats["Views"] / 1000
-)
-df_all_video_stats["Comments per 1000 Views"] = df_all_video_stats["Comments"] / (
-    df_all_video_stats["Views"] / 1000
-)
-df_all_video_stats["Publish Date"] = df_all_video_stats["Publish Date"].dt.tz_localize(
-    "US/Eastern", nonexistent="shift_forward"
-)
-df_all_video_stats = df_all_video_stats[
-    df_all_video_stats["Publish Date"] >= settings.start_date
-]
-df_all_video_stats["Time Elapsed"] = (
-    df_all_video_stats["Pull Date"] - df_all_video_stats["Publish Date"]
-)
-df_all_video_stats["Days Elapsed"] = (
-    df_all_video_stats["Time Elapsed"]
-    .apply(lambda et: et.total_seconds() / 86400)
-    .round(decimals=1)
-)
-df_all_video_stats = df_all_video_stats.sort_values(by="Pull Date")
-df_all_video_stats = df_all_video_stats[
-    df_all_video_stats["Publish Date"] >= earliest_pull_date
-]
-num_bins = math.ceil(df_all_video_stats["Days Elapsed"].max())
-df_all_video_stats["Bin"] = pd.cut(df_all_video_stats["Days Elapsed"], bins=num_bins)
+
+def get_all_video_stats():
+    logger.info("Creating 'All Video' stats")
+    df_all_video_stats = crud.processed_stat.get_all_stats()
+    df_all_video_stats["Likes per 1000 Views"] = df_all_video_stats["Likes"] / (
+        df_all_video_stats["Views"] / 1000
+    )
+    df_all_video_stats["Comments per 1000 Views"] = df_all_video_stats["Comments"] / (
+        df_all_video_stats["Views"] / 1000
+    )
+    df_all_video_stats["Publish Date"] = df_all_video_stats[
+        "Publish Date"
+    ].dt.tz_localize("US/Eastern", nonexistent="shift_forward")
+    df_all_video_stats = df_all_video_stats[
+        df_all_video_stats["Publish Date"] >= settings.start_date
+    ]
+    df_all_video_stats["Time Elapsed"] = (
+        df_all_video_stats["Pull Date"] - df_all_video_stats["Publish Date"]
+    )
+    df_all_video_stats["Days Elapsed"] = (
+        df_all_video_stats["Time Elapsed"]
+        .apply(lambda et: et.total_seconds() / 86400)
+        .round(decimals=1)
+    )
+    df_all_video_stats = df_all_video_stats.sort_values(by="Pull Date")
+    df_all_video_stats = df_all_video_stats[
+        df_all_video_stats["Publish Date"] >= earliest_pull_date
+    ]
+    num_bins = math.ceil(df_all_video_stats["Days Elapsed"].max())
+    df_all_video_stats["Bin"] = pd.cut(
+        df_all_video_stats["Days Elapsed"], bins=num_bins
+    )
+
+    return df_all_video_stats
 
 
 # -- Latest Video Stats --
