@@ -99,7 +99,6 @@ dt_est = date_pulled.astimezone(tz)
 
 footer_notes = [
     f"All data is current as of {dt_est:{date_format}}",
-    f"Data includes only videos posted since {config.settings.start_date}.",
     "Content is pulled daily at 6:30PM PST, 9:30PM EST.",
 ]
 

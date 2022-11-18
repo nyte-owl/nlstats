@@ -15,7 +15,8 @@ def write_latest_raw_youtube(
     all_video_ids = crud.video.get_all_video_ids()
 
     for idx, row in df.iterrows():
-        logger.debug(f"Write latest raw YT: {idx}")
+        if idx % 1000 == 0:
+            logger.debug(f"Write latest raw YT: {idx}")
         unique_youtube_id = row["id"]
         if unique_youtube_id not in all_video_ids:
             crud.video.create_video(unique_youtube_id)
@@ -63,8 +64,6 @@ def write_latest_processed_youtube(
                 views=row["Views"],
                 likes=row["Likes"],
                 comments=row["Comments"],
-                ratio_likes_views=row["Likes per 1000 Views"],
-                ratio_comments_views=row["Comments per 1000 Views"],
             )
         )
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -121,8 +121,6 @@ class ProcessedStat(Base):
     views = Column(Integer, nullable=False)
     likes = Column(Integer, nullable=False)
     comments = Column(Integer, nullable=False)
-    ratio_likes_views = Column(Float, nullable=False)
-    ratio_comments_views = Column(Float, nullable=False)
 
     collection_event = relationship("CollectionEvent", back_populates="processed_stats")
     video_info = relationship("Video", back_populates="processed_stats")
@@ -135,7 +133,5 @@ class ProcessedStat(Base):
             f"views={self.views}, "
             f"likes={self.likes}, "
             f"comments={self.comments}, "
-            f"ratio_likes_views={self.ratio_likes_views}, "
-            f"ratio_comments_views={self.ratio_comments_views} "
             "]>"
         )

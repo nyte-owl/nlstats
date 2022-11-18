@@ -19,15 +19,12 @@ class CreateProcessedStat(BaseModel):
     views: int
     likes: int
     comments: int
-    ratio_likes_views: float
-    ratio_comments_views: float
 
 
 def create_processed_stats(new_items: List[CreateProcessedStat]):
     with get_session() as session:
         for data in new_items:
             db_item = ProcessedStat(**data.dict())
-            logger.debug(f"Create row in DB: {db_item}")
 
             session.add(db_item)
 
@@ -46,8 +43,6 @@ def get_most_recent_processed_stat_dataframe() -> pd.DataFrame:
     - "Likes"
     - "Views"
     - "Comments"
-    - "Likes per 1000 Views"
-    - "Comments per 1000 Views"
     """
     most_recent_collection_event = (
         crud.collection_event.get_most_recent_collection_event()
@@ -63,8 +58,6 @@ def get_most_recent_processed_stat_dataframe() -> pd.DataFrame:
         "Likes": ProcessedStat.likes,
         "Views": ProcessedStat.views,
         "Comments": ProcessedStat.comments,
-        "Likes per 1000 Views": ProcessedStat.ratio_likes_views,
-        "Comments per 1000 Views": ProcessedStat.ratio_comments_views,
     }
     query = (
         select(list(columns.values()))

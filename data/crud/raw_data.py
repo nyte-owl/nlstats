@@ -1,7 +1,10 @@
 from typing import List
 
+import pandas as pd
 from pydantic import BaseModel
+from sqlalchemy import select
 
+from .. import crud
 from ..database import get_session
 from log import get_logger
 from ..mappers import RawData
@@ -30,3 +33,50 @@ def create_raw_video_data(new_items: List[CreateRawData]):
             session.add(db_item)
 
         session.commit()
+
+
+def get_raw_dataframe_from_collection_event(event_id: int) -> pd.DataFrame:
+    columns = {
+        "id": RawData.id,
+        "video_id": RawData.video_id,
+        "collection_event_id": RawData.collection_event_id,
+        "kind": RawData.kind,
+        "etag": RawData.etag,
+        "snippet": RawData.snippet,
+        "content_details": RawData.content_details,
+        "statistics": RawData.statistics,
+    }
+
+    query = select(list(columns.values())).where(
+        RawData.collection_event_id == event_id
+    )
+
+    with get_session() as session:
+        data = session.execute(query).all()
+
+    return pd.DataFrame(
+        data,
+        columns=list(columns.keys()),
+    )
+
+
+def get_most_recent_raw_dataframe() -> pd.DataFrame:
+    """
+    Columns:
+    - "id"
+    - "video_id"
+    - "collection_event_id"
+    - "kind"
+    - "etag"
+    - "snippet"
+    - "content_details"
+    - "statistics"
+    """
+    most_recent_collection_event = (
+        crud.collection_event.get_most_recent_collection_event()
+    )
+
+    logger.info(
+        f"Retrieving raw data from collection event {most_recent_collection_event.id}"
+    )
+    return get_raw_dataframe_from_collection_event(most_recent_collection_event.id)

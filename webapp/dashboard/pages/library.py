@@ -14,9 +14,6 @@ from .. import data, util
 logger = log.get_logger(__name__)
 
 df_videos = data.df_latest_video_stats.sort_values(by="Publish Date", ascending=False)
-df_videos["Publish Date"] = (
-    df_videos["Publish Date"].dt.tz_localize("utc").dt.tz_convert("US/Pacific")
-)
 
 
 def create_video_card(video: pd.Series):
@@ -245,7 +242,7 @@ def create_skeleton_card():
 layout = dmc.Stack(
     [
         modal,
-        dmc.Center(dmc.Title("NorthernLion Library", order=1)),
+        dmc.Center(dmc.Title("Northernlion Library", order=1)),
         dmc.Center(
             [
                 d_game_selector := dmc.MultiSelect(

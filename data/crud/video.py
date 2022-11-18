@@ -35,7 +35,6 @@ def get_video_by_id(video_id: str) -> Video | None:
 
 def create_video(unique_youtube_id: str):
     db_item = Video(unique_youtube_id=unique_youtube_id)
-    logger.debug(f"Create row in DB: {db_item}")
 
     with get_session() as session:
         session.add(db_item)

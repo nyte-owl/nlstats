@@ -15,7 +15,7 @@ class GeneralSettings(BaseSettings):
 
     gtag_analytics_code: str
 
-    start_date: str = "2019-06-01"
+    start_date: str = "2010-11-08"
 
     heroku_app_name: str = "nlstats"
     heroku_oauth_token: str

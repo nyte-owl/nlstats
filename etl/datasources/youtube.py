@@ -32,6 +32,9 @@ def get_page_of_videos_from_upload_playlist(page_token: str = None):
 
     playlist_data = r.json()
 
+    if "nextPageToken" not in playlist_data:
+        return None, None
+
     next_page_token = playlist_data["nextPageToken"]
     video_ids = [video["contentDetails"]["videoId"] for video in playlist_data["items"]]
 
@@ -60,11 +63,8 @@ def get_page_of_videos_from_upload_playlist(page_token: str = None):
 def pull_uploads_from_youtube() -> pd.DataFrame:
     next_page = None
 
-    since = datetime.strptime(settings.start_date, r"%Y-%m-%d")
-
     all_videos = []
     while True:
-        # logger.debug(f"{next_page=}")
         time.sleep(2)
         videos, next_page = get_page_of_videos_from_upload_playlist(next_page)
         if not videos:
@@ -77,8 +77,5 @@ def pull_uploads_from_youtube() -> pd.DataFrame:
         )
 
         logger.debug(f"Oldest video from response from {dt}")
-        # TODO: need to consistently filter out videos older than target date
-        if dt < since:
-            break
 
     return pd.DataFrame(all_videos)
