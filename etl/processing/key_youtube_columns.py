@@ -46,6 +46,7 @@ def clean_video_data(df_videos: pd.DataFrame):
             return "NLSS"
 
         simple_regex_attempts = [
+            r"(RimWorld)",
             r"([^-]+) - Season",
             # Hearthstone Arena Northernlion's Den! [Episode 28]
             r"(Hearthstone)",
