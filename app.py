@@ -99,7 +99,7 @@ dt_est = date_pulled.astimezone(tz)
 
 footer_notes = [
     f"All data is current as of {dt_est:{date_format}}",
-    "Content is pulled daily at 6:30PM PST, 9:30PM EST.",
+    "Content is pulled daily at 3:30PM PST, 6:30PM EST.",
 ]
 
 footer = []
